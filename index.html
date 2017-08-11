@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="dist/css/bootstrap-select.min.css">
+  <script src="node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="dist/js/bootstrap-select-ajax.min.js"></script>
+</head>
+
+<body>
+  <h1>demo</h1>
+  <div>
+    <select class="ajax-search" ajax-url="http://www.baidu.com" ajax-params="{#pnType#: #onePart#, #fromSys#: #scmship#}" ajax-option-name="name" ajax-option-value="age" default-data="{#name#: #xiaoming#, #age#: 28}" ajax-search-key="key"></select>
+  </div>
+
+</body>
+
+</html>
+<script>
+  (function() {
+    if (!$('select.ajax-search').hasClass('ajax-search')) {
+      return;
+    }
+
+    $('select.ajax-search').selectpicker({
+      liveSearch: true,
+      size: 10,
+      container: 'body',
+      liveSearchPlaceholder: '输入搜索',
+      noneSelectedText: '输入搜索',
+    });
+
+    // clear select options
+    function _refreshSelectPicker($obj, str) {
+      if (str) {
+        $obj.html(str).selectpicker('refresh');
+        return;
+      }
+      $obj.html(' ').selectpicker('refresh');
+    }
+
+    // to json
+    function _toJson(str) {
+      if (str) {
+        return JSON.parse(str.replace(/#/g, '"'));
+      }
+      return false;
+    }
+
+    // creat select options
+    function _creatOptions(data, optionName, optionValue) {
+      if (data && data.length > 0) {
+        var options = '';
+        for (var index = 0; index < data.length; index++) {
+          var name = data[index][optionName];
+          options += '<option value="' + data[index][optionValue] + '">' + name + '</option>';
+        }
+        return options;
+      }
+    }
+
+    // set default select value
+    for (var i = 0; i < $('select.ajax-search').length; i++) {
+      var $item = $($('select.ajax-search')[i]);
+      var data = _toJson($item.attr('default-data'));
+      if (data) {
+        var options = _creatOptions([data], $item.attr('ajax-option-name'), $item.attr('ajax-option-value'))
+        _refreshSelectPicker($item, options);
+      }
+    }
+
+    // bind keyup event
+    $(document)
+      .on('keyup', '.bootstrap-select.open.ajax-search .bs-searchbox>input', function(e) {
+        var stamp = $(this).parents('.bootstrap-select.ajax-search.open').attr('selectpicker-stamp');
+        var $select = $('[selectpicker-stamp="' + stamp + '"]').find('select');
+        var api = $select.attr('ajax-url');
+        var params = {};
+        if ($select.attr('ajax-params')) {
+          params = _toJson($select.attr('ajax-params'));
+        }
+        var optionName = $select.attr('ajax-option-name');
+        var optionValue = $select.attr('ajax-option-value');
+        params[$select.attr('ajax-search-key')] = $('.bootstrap-select.ajax-search.open').find('input').val();
+        if (event.key === 'Control') {
+          return;
+        }
+        if ($(this).val()) {
+          // open loading code
+          // ajax
+          $.get(api, params)
+            .done(function(res) {
+              if (res.status === 'success') { // response success
+                _refreshSelectPicker($select, _creatOptions(res.data, optionName, optionValue));
+              } else { // response fail
+                _refreshSelectPicker($select); // in prod remove this  comments
+              }
+            })
+            .always(function() {
+              // close loading code
+            })
+            .fail(function() {
+              var mockData = [];
+              for (var index = 0; index < 3; index++) {
+                var mockObj = {};
+                mockObj[optionName] = 'test' + index;
+                mockObj[optionValue] = index;
+                mockData.push(mockObj);
+              }
+              alert('this is a mock data,remove it in prod');
+              _refreshSelectPicker($select, _creatOptions(mockData, optionName, optionValue));
+            });
+        } else {
+          _refreshSelectPicker($select);
+        }
+      });
+  })();
+</script>
