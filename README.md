@@ -12,23 +12,6 @@ Notice: This package is forked from [silviomoreto/bootstrap-select](https://gith
 <select class="ajax-search" ajax-url="your ajax api" ajax-params="{#pnType#: #onePart#, #fromSys#: #scmship#}" ajax-option-name="name" ajax-option-value="age" default-data="{#name#: #xiaoming#, #age#: 28}"></select>
 ```
 
-## Result
-
-```html
-<!-- if your response data like this:-->
-<!-- [{"name": "xiaoming", "age": 28},{"name": "xiaohong", "age": 27}] -->
-<div class="btn-group bootstrap-select" selectpicker-stamp="1502433999924" stamp="1502433999">
-  <button type="button" class="btn dropdown-toggle btn-default" data-toggle="dropdown" role="button" title="请选择" aria-expanded="true">
-    <span class="filter-option pull-left">请选择</span>&nbsp;
-    <span class="bs-caret"><span class="caret"></span></span>
-  </button>
-  <select class="selectpicker ajax-search" ajax-url="your ajax api" ajax-params="{#pnType#: #onePart#, #fromSys#: #scmship#}" ajax-option-name="name" ajax-option-value="age" default-data="{#name#: #xiaoming#, #age#: 28}" tabindex="-98">
-    <option value="28" selected="selected">xiaoming</option>
-    <option value="27">xiaohong</option>
-  </select>
-</div>
-```
-
 ## Attribute description
 
 |Attribute|type|description|
